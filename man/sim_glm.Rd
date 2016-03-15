@@ -2,12 +2,34 @@
 % Please edit documentation in R/sim_glm.R
 \name{sim_glm}
 \alias{sim_glm}
-\title{Simulate quantities of interest from generalised linear models}
+\title{Simulate and plot quantities of interest from generalised linear models}
 \usage{
-sim_glm(obj, newdata, x_var, group_var, n = 1000, model = "lm", col_pal)
+sim_glm(obj, newdata, x_coef, group_coef, n = 1000, model = "lm", col_pal)
+}
+\arguments{
+\item{obj}{fitted model object from \code{lm} or \code{glm}}
+
+\item{newdata}{data frame with fitted values for finding the quantities of
+interest. Column names must match coefficient names in \code{obj}. You do
+not need to specify fitted values for all coefficients. Unspecified
+coefficients will be fitted at 0.}
+
+\item{x_coef}{character string naming the variable from \code{obj} that
+will be plotted along the x-axis.}
+
+\item{group_coef}{optional character string specifying the values for the
+coefficient in \code{obj} along which the values of \code{x_coef} will be
+grouped in the plot.}
+
+\item{n}{numeric specifying the number of simulations to run.}
+
+\item{model}{character string specifying the type of estimation model.
+Currently must be either \code{lm} or \code{logit}.}
+
+\item{col_pal}{character string specifying the plot's colour palette.}
 }
 \description{
-Simulate quantities of interest from generalised linear models
+Simulate and plot quantities of interest from generalised linear models
 }
 \examples{
 # Normal Linear Model example
@@ -17,12 +39,12 @@ m1 <- lm(prestige ~ education + type,
 
 fitted_prestige <- expand.grid(education = 6:16, typewc = 1)
 
-sim_glm(obj = m1, newdata = fitted_prestige, x_var = 'education')
+sim_glm(obj = m1, newdata = fitted_prestige, x_coef = 'education')
 
 fitted_prestige <- expand.grid(education = 6:16,
                                typewc = 0:1)
-sim_glm(obj = m1, newdata = fitted_prestige, x_var = 'education',
-        group_var = 'typewc')
+sim_glm(obj = m1, newdata = fitted_prestige, x_coef = 'education',
+        group_coef = 'typewc')
 
 # Logistic Model example
 URL <- 'http://www.ats.ucla.edu/stat/data/binary.csv'
@@ -37,13 +59,13 @@ fitted_admit_1 <- with(Admission,
                                    gpa = mean(gpa),
                                    rank2 = 0:1))
 
-sim_glm(obj = m2, newdata = fitted_admit_1, x_var = 'gre',
-        group_var = 'rank2', model = 'logit')
+sim_glm(obj = m2, newdata = fitted_admit_1, x_coef = 'gre',
+        group_coef = 'rank2', model = 'logit')
 
 fitted_admit_2 <- expand.grid(gre = seq(220, 800, by = 10), gpa = c(2, 3.5),
                               rank4 = 1)
 sim_glm(obj = m2, newdata = fitted_admit_2, model = 'logit',
-        x_var = 'gre', group_var = 'gpa')
+        x_coef = 'gre', group_coef = 'gpa')
 
 }
 

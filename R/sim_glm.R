@@ -1,5 +1,19 @@
-#' Simulate quantities of interest from generalised linear models
+#' Simulate and plot quantities of interest from generalised linear models
 #'
+#' @param obj fitted model object from \code{lm} or \code{glm}
+#' @param newdata data frame with fitted values for finding the quantities of
+#' interest. Column names must match coefficient names in \code{obj}. You do
+#' not need to specify fitted values for all coefficients. Unspecified
+#' coefficients will be fitted at 0.
+#' @param x_coef character string naming the variable from \code{obj} that
+#' will be plotted along the x-axis.
+#' @param group_coef optional character string specifying the values for the
+#' coefficient in \code{obj} along which the values of \code{x_coef} will be
+#' grouped in the plot.
+#' @param n numeric specifying the number of simulations to run.
+#' @param model character string specifying the type of estimation model.
+#' Currently must be either \code{lm} or \code{logit}.
+#' @param col_pal character string specifying the plot's colour palette.
 #'
 #' @examples
 #' # Normal Linear Model example
@@ -9,12 +23,12 @@
 #'
 #' fitted_prestige <- expand.grid(education = 6:16, typewc = 1)
 #'
-#' sim_glm(obj = m1, newdata = fitted_prestige, x_var = 'education')
+#' sim_glm(obj = m1, newdata = fitted_prestige, x_coef = 'education')
 #'
 #' fitted_prestige <- expand.grid(education = 6:16,
 #'                                typewc = 0:1)
-#' sim_glm(obj = m1, newdata = fitted_prestige, x_var = 'education',
-#'         group_var = 'typewc')
+#' sim_glm(obj = m1, newdata = fitted_prestige, x_coef = 'education',
+#'         group_coef = 'typewc')
 #'
 #' # Logistic Model example
 #' URL <- 'http://www.ats.ucla.edu/stat/data/binary.csv'
@@ -29,13 +43,13 @@
 #'                                    gpa = mean(gpa),
 #'                                    rank2 = 0:1))
 #'
-#' sim_glm(obj = m2, newdata = fitted_admit_1, x_var = 'gre',
-#'         group_var = 'rank2', model = 'logit')
+#' sim_glm(obj = m2, newdata = fitted_admit_1, x_coef = 'gre',
+#'         group_coef = 'rank2', model = 'logit')
 #'
 #' fitted_admit_2 <- expand.grid(gre = seq(220, 800, by = 10), gpa = c(2, 3.5),
 #'                               rank4 = 1)
 #' sim_glm(obj = m2, newdata = fitted_admit_2, model = 'logit',
-#'         x_var = 'gre', group_var = 'gpa')
+#'         x_coef = 'gre', group_coef = 'gpa')
 #'
 #' @import ggplot2
 #' @importFrom MASS mvrnorm
@@ -44,27 +58,33 @@
 #' @export
 
 
-sim_glm <- function(obj, newdata, x_var, group_var, n = 1000, model = 'lm',
-                    col_pal) {
+sim_glm <- function(obj,
+                    newdata,
+                    x_coef,
+                    group_coef,
+                    n = 1000,
+                    model = 'lm',
+                    col_pal)
+{
     # CRAN stuff
-    qi__ <- xvar__ <- mean_sim <- lower_90 <- lower_95 <- upper_90 <-
-        upper_95 <- group_var__ <- NULL
+    qi_ <- xvar__ <- mean_sim <- lower_90 <- lower_95 <- upper_90 <-
+        upper_95 <- group_coef__ <- NULL
 
     # Argument sanity check --------
     if (!(model %in% c('lm', 'logit'))) stop('model must be either "lm" or "logit.',
                                              call. = FALSE)
 
-    if (missing(x_var)) {
-        if (missing(x_var) & ncol(newdata) == 1) {
-            x_var <- names(newdata)
-            message(sprintf('%s set for x_var.', names(newdata)))
+    if (missing(x_coef)) {
+        if (missing(x_coef) & ncol(newdata) == 1) {
+            x_coef <- names(newdata)
+            message(sprintf('%s set for x_coef.', names(newdata)))
         }
-        if (missing(x_var)) stop("x_var must be specified to determine the simulation plot's x-axis.",
+        if (missing(x_coef)) stop("x_coef must be specified to determine the simulation plot's x-axis.",
                                  call. = FALSE)
     }
 
-    if (!missing(group_var) & length(unique(newdata[, group_var])) == 1) stop(
-        'Your group_var only has one value, so there is no need to set group_var.',
+    if (!missing(group_coef) & length(unique(newdata[, group_coef])) == 1) stop(
+        'Your group_coef only has one value, so there is no need to set group_coef.',
         call. = FALSE
     )
 
@@ -80,10 +100,10 @@ sim_glm <- function(obj, newdata, x_var, group_var, n = 1000, model = 'lm',
     drawn_names <- names(drawn)
     if (any(!(names(newdata) %in% drawn_names))) stop('All column names in newdata must match *coefficient names* in the fitted model.',
                                                  call. = FALSE)
-    if (!(x_var %in% drawn_names)) stop('x_var must be a *coefficient name* in the fitted model',
+    if (!(x_coef %in% drawn_names)) stop('x_coef must be a *coefficient name* in the fitted model',
                                         call. = FALSE)
-    if (!missing(group_var)){
-        if (!(group_var %in% drawn_names)) stop('group_var must be a *coefficient name* in the fitted model',
+    if (!missing(group_coef)){
+        if (!(group_coef %in% drawn_names)) stop('group_coef must be a *coefficient name* in the fitted model',
                                             call. = FALSE)
     }
 
@@ -124,26 +144,26 @@ sim_glm <- function(obj, newdata, x_var, group_var, n = 1000, model = 'lm',
         qi_name <- 'Pr(y = 1)\n'
     }
 
-    # Find original distribution of x_var for rug plot --------
+    # Find original distribution of x_coef for rug plot --------
     original_data <- model.frame(obj)
-    rug <- original_data[, x_var]
-    if (missing(group_var)) {
+    rug <- original_data[, x_coef]
+    if (missing(group_coef)) {
         rug <- data.frame(xvar__ = rug, mean_sim = 1)
         names(rug) <- c('xvar__', 'mean_sim')
     }
-    else if (!missing(group_var)) {
+    else if (!missing(group_coef)) {
         rug <- data.frame(xvar__ = rug, mean_sim = 1,
-                          group_var__ = as.factor(min(newdata[, sprintf('%s_fitted_',
-                                                              group_var)])))
-        names(rug) <- c('xvar__', 'mean_sim', 'group_var__')
+                          group_coef__ = as.factor(min(newdata[, sprintf('%s_fitted_',
+                                                              group_coef)])))
+        names(rug) <- c('xvar__', 'mean_sim', 'group_coef__')
     }
 
     # Find central intervals
-    xvar_position <- match(sprintf('%s_fitted_', x_var), names_fitted)
+    xvar_position <- match(sprintf('%s_fitted_', x_coef), names_fitted)
     names(drawn_fitted)[xvar_position] <- 'xvar__'
 
     # Plot with no groups ----------
-    if (missing(group_var)) {
+    if (missing(group_coef)) {
         central <- drawn_fitted %>% group_by(xvar__) %>%
             summarise(mean_sim = mean(qi_),
                       lower_95 = quantile(qi_, probs = 0.025),
@@ -160,26 +180,26 @@ sim_glm <- function(obj, newdata, x_var, group_var, n = 1000, model = 'lm',
     }
 
     # Plot with groups ----------
-    else if (!missing(group_var)) {
-        group_position <- match(sprintf('%s_fitted_', group_var), names_fitted)
-        if (is.na(group_position)) stop('group_var must be a variable in newdata.',
+    else if (!missing(group_coef)) {
+        group_position <- match(sprintf('%s_fitted_', group_coef), names_fitted)
+        if (is.na(group_position)) stop('group_coef must be a variable in newdata.',
                                         call. = FALSE)
-        names(drawn_fitted)[group_position] <- 'group_var__'
+        names(drawn_fitted)[group_position] <- 'group_coef__'
 
-        central <- drawn_fitted %>% group_by(xvar__, group_var__) %>%
+        central <- drawn_fitted %>% group_by(xvar__, group_coef__) %>%
             summarise(mean_sim = mean(qi_),
                       lower_95 = quantile(qi_, probs = 0.025),
                       upper_95 = quantile(qi_, probs = 0.975),
                       lower_90 = quantile(qi_, probs = 0.05),
                       upper_90 = quantile(qi_, probs = 0.95)
             )
-        central$group_var__ <- as.factor(central$group_var__)
+        central$group_coef__ <- as.factor(central$group_coef__)
 
         # Organise colour palette
         ## Modified Darjeeling palette from wesanderson package
         if (missing(col_pal)) col_pal <- c("#F98400", "#5BBCD6",
                                            "#FF0000", "#00A08A", "#F2AD00")
-        n_levels <- length(unique(as.factor(central$group_var__)))
+        n_levels <- length(unique(as.factor(central$group_coef__)))
         if(length(col_pal) > length(n_levels)) {
             col_pal <- col_pal[1:n_levels]
         }
@@ -190,16 +210,16 @@ sim_glm <- function(obj, newdata, x_var, group_var, n = 1000, model = 'lm',
 
         # Plot
         out_plot <- ggplot(central, aes(xvar__, mean_sim,
-                            group = group_var__,
-                            fill = group_var__)) +
+                            group = group_coef__,
+                            fill = group_coef__)) +
             geom_ribbon(aes(ymin = lower_90, ymax = upper_90), alpha = 0.05) +
             geom_ribbon(aes(ymin = lower_95, ymax = upper_95), alpha = 0.05) +
-            geom_line(aes(colour = group_var__)) +
-            scale_colour_manual(values = col_pal, name = group_var) +
-            scale_fill_manual(values = col_pal, name = group_var)
+            geom_line(aes(colour = group_coef__)) +
+            scale_colour_manual(values = col_pal, name = group_coef) +
+            scale_fill_manual(values = col_pal, name = group_coef)
 
     }
-    out_plot + xlab(sprintf('\n%s', x_var)) + ylab(qi_name) +
+    out_plot + xlab(sprintf('\n%s', x_coef)) + ylab(qi_name) +
                 geom_rug(data = rug, aes(x = xvar__, y = mean_sim),
                          sides = 'b', alpha = 0.2) +
                 theme_bw()
