@@ -46,10 +46,11 @@
 
 sim_glm <- function(obj, newdata, x_var, group_var, n = 1000, model = 'lm',
                     col_pal) {
+    # CRAN stuff
+    qi__ <- xvar__ <- mean_sim <- lower_90 <- lower_95 <- upper_90 <-
+        upper_95 <- group_var__ <- NULL
 
-    require(MASS)
-
-
+    # Argument sanity check --------
     if (!(model %in% c('lm', 'logit'))) stop('model must be either "lm" or "logit.',
                                              call. = FALSE)
 
@@ -67,6 +68,7 @@ sim_glm <- function(obj, newdata, x_var, group_var, n = 1000, model = 'lm',
         call. = FALSE
     )
 
+    # Simulate -------------
     # Find point estimates and variance-covariance matrix
     coef_est <- coef(obj) %>% matrix
     vcov_est <- vcov(obj)
@@ -91,7 +93,7 @@ sim_glm <- function(obj, newdata, x_var, group_var, n = 1000, model = 'lm',
     # Merge simulated point estimates and fitted values
     drawn_fitted <- merge(drawn, newdata)
 
-    # Find quantity of interest
+    # Find quantity of interest ------------
     names_fitted <- names(drawn_fitted)
     drawn_fitted$qi_ <- 0
     for (i in drawn_names[-1]) {

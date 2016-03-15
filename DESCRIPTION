@@ -1,15 +1,15 @@
 Package: simGLM
 Type: Package
-Title: Simulate quantities of interest from generalised linear models.
+Title: Simulate Quantities of Interest from Generalised Linear Models
 Version: 0.1.0
 Date: 2016-03-15
 Authors@R: c(
     person("Christopher", "Gandrud", email = "christopher.gandrud@gmail.com",
     role = c("aut", "cre"))
-)
+    )
 Maintainer: Christopher Gandrud <christopher.gandrud@gmail.com>
 Description: Simulate quantities of interest from generalised linear models.
-Currently only supports normal linear and logistic regression models.
+    Currently only supports normal linear and logistic regression models.
 URL: https://github.com/christophergandrud/simGLM
 BugReports: https://github.com/christophergandrud/simGLM/issues
 License: GPL (>= 3)
@@ -17,4 +17,6 @@ Imports:
     dplyr,
     ggplot2,
     MASS
-LazyData: TRUE
+Suggests:
+    car
+RoxygenNote: 5.0.1
