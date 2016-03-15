@@ -5,7 +5,7 @@
 
 Christopher Gandrud
 
-
+[![Build Status](https://travis-ci.org/christophergandrud/simGLM.svg?branch=master)](https://travis-ci.org/christophergandrud/simGLM)
 
 ## Example: normal linear regression
 
@@ -37,4 +37,12 @@ fitted_admit <- expand.grid(gre = seq(220, 800, by = 10), gpa = c(2, 4),
                               rank4 = 1)
 sim_glm(obj = m2, newdata = fitted_admit, model = 'logit',
         x_coef = 'gre', group_coef = 'gpa')
+```
+
+## Install
+
+To install the development version of **simGLM** use:
+
+```{r, eval=FALSE}
+ghit::install_github('christophergandrud/simGLM')
 ```

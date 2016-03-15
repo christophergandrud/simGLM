@@ -5,7 +5,7 @@
 
 Christopher Gandrud
 
-
+[![Build Status](https://travis-ci.org/christophergandrud/simGLM.svg?branch=master)](https://travis-ci.org/christophergandrud/simGLM)
 
 ## Example: normal linear regression
 
@@ -56,3 +56,12 @@ sim_glm(obj = m2, newdata = fitted_admit, model = 'logit',
 ```
 
 ![plot of chunk unnamed-chunk-2](figure/unnamed-chunk-2-1.png)
+
+## Install
+
+To install the development version of **simGLM** use:
+
+
+```r
+ghit::install_github('christophergandrud/simGLM')
+```
