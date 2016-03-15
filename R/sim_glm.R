@@ -169,11 +169,14 @@ sim_glm <- function(obj,
                       lower_95 = quantile(qi_, probs = 0.025),
                       upper_95 = quantile(qi_, probs = 0.975),
                       lower_90 = quantile(qi_, probs = 0.05),
-                      upper_90 = quantile(qi_, probs = 0.95)
+                      upper_90 = quantile(qi_, probs = 0.95),
+                      lower_50 = quantile(qi_, probs = 0.25),
+                      upper_50 = quantile(qi_, probs = 0.75)
             )
 
         # Plot
         out_plot <- ggplot(central, aes(xvar__, mean_sim)) +
+            geom_ribbon(aes(ymin = lower_50, ymax = upper_50), alpha = 0.1) +
             geom_ribbon(aes(ymin = lower_90, ymax = upper_90), alpha = 0.05) +
             geom_ribbon(aes(ymin = lower_95, ymax = upper_95), alpha = 0.05) +
             geom_line()
@@ -191,7 +194,9 @@ sim_glm <- function(obj,
                       lower_95 = quantile(qi_, probs = 0.025),
                       upper_95 = quantile(qi_, probs = 0.975),
                       lower_90 = quantile(qi_, probs = 0.05),
-                      upper_90 = quantile(qi_, probs = 0.95)
+                      upper_90 = quantile(qi_, probs = 0.95),
+                      lower_50 = quantile(qi_, probs = 0.25),
+                      upper_50 = quantile(qi_, probs = 0.75)
             )
         central$group_coef__ <- as.factor(central$group_coef__)
 
@@ -212,6 +217,7 @@ sim_glm <- function(obj,
         out_plot <- ggplot(central, aes(xvar__, mean_sim,
                             group = group_coef__,
                             fill = group_coef__)) +
+            geom_ribbon(aes(ymin = lower_50, ymax = upper_50), alpha = 0.1) +
             geom_ribbon(aes(ymin = lower_90, ymax = upper_90), alpha = 0.05) +
             geom_ribbon(aes(ymin = lower_95, ymax = upper_95), alpha = 0.05) +
             geom_line(aes(colour = group_coef__)) +
