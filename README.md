@@ -12,6 +12,9 @@ Christopher Gandrud
 
 ```r
 library(car) # Contains data
+library(simGLM)
+library(ggplot2) # Only needed for adding additional arguments outside of sim_glm
+
 m1 <- lm(prestige ~ education + type,
          data = Prestige)
 
@@ -25,9 +28,7 @@ sim_glm(obj = m1, newdata = fitted_prestige, x_coef = 'education') +
 ## typeprof fitted at 0.
 ```
 
-```
-## Error in eval(expr, envir, enclos): could not find function "ylab"
-```
+![plot of chunk unnamed-chunk-1](figure/unnamed-chunk-1-1.png)
 
 ## Example: logistis regression
 

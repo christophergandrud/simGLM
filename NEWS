@@ -1,0 +1,4 @@
+## Version 0.1
+
+Initial version simulating predicted values of y from normal linear regression
+models and predicted probabilities of y = 1 for logistic regression models.

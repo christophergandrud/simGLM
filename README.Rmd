@@ -11,6 +11,9 @@ Christopher Gandrud
 
 ```{r}
 library(car) # Contains data
+library(simGLM)
+library(ggplot2) # Only needed for adding additional arguments outside of sim_glm
+
 m1 <- lm(prestige ~ education + type,
          data = Prestige)
 
