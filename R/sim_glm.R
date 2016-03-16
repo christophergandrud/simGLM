@@ -98,6 +98,12 @@ sim_glm <- function(obj,
         call. = FALSE
     )
 
+    # Convert factor parentheses
+    names(newdata) <- gsub('\\(', '.', names(newdata))
+    names(newdata) <- gsub('\\)', '.', names(newdata))
+    x_coef <- gsub('\\(', '.', x_coef)
+    x_coef <- gsub('\\)', '.', x_coef)
+
     if (!missing(group_coef)) {
         if (!(group_coef %in% names(newdata))) stop(
             'group_coef must be a variable in newdata.'
@@ -105,6 +111,9 @@ sim_glm <- function(obj,
         if (length(unique(newdata[, group_coef])) == 1) stop(
             'Your group_coef only has one value, so there is no need to set group_coef.',
             call. = FALSE)
+
+        group_coef <- gsub('\\(', '.', group_coef)
+        group_coef <- gsub('\\)', '.', group_coef)
     }
 
     # Simulate -------------
