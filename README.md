@@ -11,17 +11,19 @@ Christopher Gandrud
 
 
 ```r
-library(car) # Contains data
+library(car) # contains data
 library(simGLM)
-library(ggplot2) # Only needed for adding additional arguments outside of sim_glm
+library(ggplot2) # 0nly needed for adding additional arguments outside of sim_glm
 
-m1 <- lm(prestige ~ education + type,
-         data = Prestige)
+# Estimate model
+m1 <- lm(prestige ~ education + type, data = Prestige)
 
+# Create fitted values
 fitted_prestige <- expand.grid(education = 6:16, typewc = 1)
 
+# Simulate and plot
 sim_glm(obj = m1, newdata = fitted_prestige, x_coef = 'education') +
-    ylab('Predicted Job Prestige\n') + xlab('\nYears of Education')
+        ylab('Predicted Job Prestige\n') + xlab('\nYears of Education')
 ```
 
 ```
@@ -30,21 +32,25 @@ sim_glm(obj = m1, newdata = fitted_prestige, x_coef = 'education') +
 
 ![plot of chunk unnamed-chunk-1](figure/unnamed-chunk-1-1.png)
 
-## Example: logistis regression
+## Example: logistic regression
 
 
 ```r
+# Download data
 URL <- 'http://www.ats.ucla.edu/stat/data/binary.csv'
 Admission <- read.csv(URL)
 Admission$rank <- as.factor(Admission$rank)
 
-m2 <- glm(admit ~ gre + gpa + rank,
-          data = Admission, family = 'binomial')
+# Estimate model
+m2 <- glm(admit ~ gre + gpa + rank, data = Admission, family = 'binomial')
 
-fitted_admit <- expand.grid(gre = seq(220, 800, by = 10), gpa = c(2, 4),
-                              rank4 = 1)
-sim_glm(obj = m2, newdata = fitted_admit, model = 'logit',
-        x_coef = 'gre', group_coef = 'gpa')
+# Create fitted values
+fitted_admit <- expand.grid(gre = seq(220, 800, by = 10), gpa = c(2, 4), 
+                            rank4 = 1)
+
+# Simulate and plot
+sim_glm(obj = m2, newdata = fitted_admit, model = 'logit', x_coef = 'gre', 
+        group_coef = 'gpa')
 ```
 
 ```
