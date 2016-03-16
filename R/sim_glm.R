@@ -138,6 +138,18 @@ sim_glm <- function(obj,
             call. = FALSE)
     }
 
+    can_vary <- x_coef
+    if(!missing(group_coef)) can_vary <- c(can_vary, group_coef)
+
+    dont_vary <- names(newdata)[!(names(newdata) %in% can_vary)]
+    for (i in dont_vary) {
+        other_x <- length(unique(newdata[, i]))
+        if (other_x != 1) stop(
+            'To make meaningful plots, only x_var and group_var fitted values should vary.',
+            call. = FALSE
+        )
+    }
+
     # Mark fitted values as distinct from the point estimates
     names(newdata) <- sprintf('%s_fitted_', names(newdata))
 
@@ -169,7 +181,7 @@ sim_glm <- function(obj,
     if (model == 'logit') {
         # Find probabilities of y = 1
         drawn_fitted$qi_ <- exp(drawn_fitted$qi_) / (1 - exp(drawn_fitted$qi_))
-        # Drop simulations outside of [0, 1]
+        # Drop simulated quantities of interest outside of [0, 1]
         drawn_fitted <- subset(drawn_fitted, qi_ < 1)
         drawn_fitted <- subset(drawn_fitted, qi_ > 0)
         #drawn_fitted$qi_[drawn_fitted$qi_ > 1] <- 1
