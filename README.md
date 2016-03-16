@@ -76,7 +76,8 @@ library(arm)
 
 ```r
 # Estimate model
-m2 <- bayesglm(admit ~ gre + gpa + rank, data = Admission, family = 'binomial')
+m2 <- bayesglm(admit ~ gre + gpa + rank, data = Admission, 
+               family = binomial(link = 'logit'))
 
 # Simulate and plot
 sim_glm(obj = m2, newdata = fitted_admit, model = 'logit', x_coef = 'gre', 
