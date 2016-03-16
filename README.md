@@ -13,7 +13,7 @@ Christopher Gandrud
 ```r
 library(car) # contains data
 library(simGLM)
-library(ggplot2) # 0nly needed for adding additional arguments outside of sim_glm
+library(ggplot2) # only needed for adding additional arguments outside of sim_glm
 
 # Estimate model
 m1 <- lm(prestige ~ education + type, data = Prestige)
@@ -62,6 +62,66 @@ sim_glm(obj = m2, newdata = fitted_admit, model = 'logit', x_coef = 'gre',
 ```
 
 ![plot of chunk unnamed-chunk-2](figure/unnamed-chunk-2-1.png)
+
+## Examples: `bayesglm`
+
+`sim_glm` also works with estimates made using the `bayesglm` funciton in the [arm](https://cran.r-project.org/web/packages/arm/index.html) package.
+
+
+```r
+library(arm)
+```
+
+```
+## Loading required package: MASS
+```
+
+```
+## Loading required package: Matrix
+```
+
+```
+## Loading required package: lme4
+```
+
+```
+## 
+## arm (Version 1.8-6, built: 2015-7-7)
+```
+
+```
+## Working directory is /git_repositories/simGLM
+```
+
+```
+## 
+## Attaching package: 'arm'
+```
+
+```
+## The following object is masked from 'package:car':
+## 
+##     logit
+```
+
+```r
+# Estimate model
+m2 <- bayesglm(admit ~ gre + gpa + rank, data = Admission, family = 'binomial')
+
+# Simulate and plot
+sim_glm(obj = m2, newdata = fitted_admit, model = 'logit', x_coef = 'gre', 
+        group_coef = 'gpa')
+```
+
+```
+## rank2 fitted at 0.
+```
+
+```
+## rank3 fitted at 0.
+```
+
+![plot of chunk unnamed-chunk-3](figure/unnamed-chunk-3-1.png)
 
 ## Install
 
