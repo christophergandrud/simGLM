@@ -72,37 +72,6 @@ sim_glm(obj = m2, newdata = fitted_admit, model = 'logit', x_coef = 'gre',
 library(arm)
 ```
 
-```
-## Loading required package: MASS
-```
-
-```
-## Loading required package: Matrix
-```
-
-```
-## Loading required package: lme4
-```
-
-```
-## 
-## arm (Version 1.8-6, built: 2015-7-7)
-```
-
-```
-## Working directory is /git_repositories/simGLM
-```
-
-```
-## 
-## Attaching package: 'arm'
-```
-
-```
-## The following object is masked from 'package:car':
-## 
-##     logit
-```
 
 ```r
 # Estimate model
@@ -121,7 +90,7 @@ sim_glm(obj = m2, newdata = fitted_admit, model = 'logit', x_coef = 'gre',
 ## rank3 fitted at 0.
 ```
 
-![plot of chunk unnamed-chunk-3](figure/unnamed-chunk-3-1.png)
+![plot of chunk unnamed-chunk-4](figure/unnamed-chunk-4-1.png)
 
 ## Install
 

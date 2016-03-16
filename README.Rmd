@@ -49,8 +49,11 @@ sim_glm(obj = m2, newdata = fitted_admit, model = 'logit', x_coef = 'gre',
 
 `sim_glm` also works with estimates made using the `bayesglm` funciton in the [arm](https://cran.r-project.org/web/packages/arm/index.html) package.
 
-```{r}
+```{r, message=FALSE}
 library(arm)
+```
+
+```{r}
 
 # Estimate model
 m2 <- bayesglm(admit ~ gre + gpa + rank, data = Admission, family = 'binomial')
