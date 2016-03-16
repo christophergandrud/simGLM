@@ -25,8 +25,8 @@
 #'
 #' sim_glm(obj = m1, newdata = fitted_prestige, x_coef = 'education')
 #'
-#' fitted_prestige <- expand.grid(education = 6:16,
-#'                                typewc = 0:1)
+#' fitted_prestige <- expand.grid(education = 6:16, typewc = 0:1)
+#'
 #' sim_glm(obj = m1, newdata = fitted_prestige, x_coef = 'education',
 #'         group_coef = 'typewc')
 #'
@@ -44,12 +44,16 @@
 #'                                    rank2 = 0:1))
 #'
 #' sim_glm(obj = m2, newdata = fitted_admit_1, x_coef = 'gre',
-#'         group_coef = 'rank2', model = 'logit')
+#'         group_coef = 'rank2', model = 'logit', n = 100)
 #'
 #' fitted_admit_2 <- expand.grid(gre = seq(220, 800, by = 10), gpa = c(2, 3.5),
 #'                               rank4 = 1)
 #' sim_glm(obj = m2, newdata = fitted_admit_2, model = 'logit',
-#'         x_coef = 'gre', group_coef = 'gpa')
+#'         x_coef = 'gre', group_coef = 'gpa', n = 100)
+#'
+#' @source King, Gary, Michael Tomz, and Jason Wittenberg. 2000. "Making the
+#' Most of Statistical Analyses: Improving Interpretation and Presentation."
+#' American Journal of Political Science 44(2): 341-55.
 #'
 #' @import ggplot2
 #' @importFrom MASS mvrnorm
@@ -67,26 +71,38 @@ sim_glm <- function(obj,
                     col_pal)
 {
     # CRAN stuff
-    qi_ <- xvar__ <- mean_sim <- lower_90 <- lower_95 <- upper_90 <-
-        upper_95 <- group_coef__ <- NULL
+    qi_ <- xvar__ <- median_sim <- lower_50 <- upper_50 <- lower_90 <-
+        lower_95 <- upper_90 <- upper_95 <- group_coef__ <- NULL
 
     # Argument sanity check --------
-    if (!(model %in% c('lm', 'logit'))) stop('model must be either "lm" or "logit.',
+    model <- tolower(model)
+    if (!(model %in% c('lm', 'logit'))) stop('model must be either lm or logit.',
                                              call. = FALSE)
+
+    if (!is.data.frame(newdata)) stop(
+        'newdata must be a data frame of fitted values',
+        call. = FALSE)
 
     if (missing(x_coef)) {
         if (missing(x_coef) & ncol(newdata) == 1) {
             x_coef <- names(newdata)
             message(sprintf('%s set for x_coef.', names(newdata)))
         }
-        if (missing(x_coef)) stop("x_coef must be specified to determine the simulation plot's x-axis.",
-                                 call. = FALSE)
+        if (missing(x_coef)) stop(
+            "x_coef must be specified to determine the simulation plot's x-axis.",
+            call. = FALSE)
     }
 
-    if (!missing(group_coef) & length(unique(newdata[, group_coef])) == 1) stop(
-        'Your group_coef only has one value, so there is no need to set group_coef.',
+    if (length(unique(newdata[, x_coef])) == 1) stop(
+        'You have only specified one unique fitted value for x_coef. \n More than one value needed to create a useful plot',
         call. = FALSE
     )
+
+    if (!missing(group_coef)) {
+        if (length(unique(newdata[, group_coef])) == 1) stop(
+            'Your group_coef only has one value, so there is no need to set group_coef.',
+            call. = FALSE)
+    }
 
     # Simulate -------------
     # Find point estimates and variance-covariance matrix
@@ -98,13 +114,16 @@ sim_glm <- function(obj,
 
     # Ensure fitted variables match
     drawn_names <- names(drawn)
-    if (any(!(names(newdata) %in% drawn_names))) stop('All column names in newdata must match *coefficient names* in the fitted model.',
-                                                 call. = FALSE)
-    if (!(x_coef %in% drawn_names)) stop('x_coef must be a *coefficient name* in the fitted model',
-                                        call. = FALSE)
+    if (any(!(names(newdata) %in% drawn_names))) stop(
+        'All column names in newdata must match *coefficient names* in the fitted model.',
+        call. = FALSE)
+    if (!(x_coef %in% drawn_names)) stop(
+        'x_coef must be a *coefficient name* in the fitted model',
+        call. = FALSE)
     if (!missing(group_coef)){
-        if (!(group_coef %in% drawn_names)) stop('group_coef must be a *coefficient name* in the fitted model',
-                                            call. = FALSE)
+        if (!(group_coef %in% drawn_names)) stop(
+            'group_coef must be a *coefficient name* in the fitted model',
+            call. = FALSE)
     }
 
     # Mark fitted values as distinct from the point estimates
@@ -139,8 +158,10 @@ sim_glm <- function(obj,
         # Find probabilities of y = 1
         drawn_fitted$qi_ <- exp(drawn_fitted$qi_) / (1 - exp(drawn_fitted$qi_))
         # Drop simulations outside of [0, 1]
-        drawn_fitted <- subset(drawn_fitted, qi_ < 1)
-        drawn_fitted <- subset(drawn_fitted, qi_ > 0)
+        #drawn_fitted <- subset(drawn_fitted, qi_ < 1)
+        #drawn_fitted <- subset(drawn_fitted, qi_ > 0)
+        drawn_fitted$qi_[drawn_fitted$qi_ > 1] <- 1
+        drawn_fitted$qi_[drawn_fitted$qi_ < 1] <- 0
         qi_name <- 'Pr(y = 1)\n'
     }
 
@@ -148,14 +169,14 @@ sim_glm <- function(obj,
     original_data <- model.frame(obj)
     rug <- original_data[, x_coef]
     if (missing(group_coef)) {
-        rug <- data.frame(xvar__ = rug, mean_sim = 1)
-        names(rug) <- c('xvar__', 'mean_sim')
+        rug <- data.frame(xvar__ = rug, median_sim = 1)
+        names(rug) <- c('xvar__', 'median_sim')
     }
     else if (!missing(group_coef)) {
-        rug <- data.frame(xvar__ = rug, mean_sim = 1,
+        rug <- data.frame(xvar__ = rug, median_sim = 1,
                           group_coef__ = as.factor(min(newdata[, sprintf('%s_fitted_',
                                                               group_coef)])))
-        names(rug) <- c('xvar__', 'mean_sim', 'group_coef__')
+        names(rug) <- c('xvar__', 'median_sim', 'group_coef__')
     }
 
     # Find central intervals
@@ -165,7 +186,7 @@ sim_glm <- function(obj,
     # Plot with no groups ----------
     if (missing(group_coef)) {
         central <- drawn_fitted %>% group_by(xvar__) %>%
-            summarise(mean_sim = mean(qi_),
+            summarise(median_sim = median(qi_),
                       lower_95 = quantile(qi_, probs = 0.025),
                       upper_95 = quantile(qi_, probs = 0.975),
                       lower_90 = quantile(qi_, probs = 0.05),
@@ -175,7 +196,7 @@ sim_glm <- function(obj,
             )
 
         # Plot
-        out_plot <- ggplot(central, aes(xvar__, mean_sim)) +
+        out_plot <- ggplot(central, aes(xvar__, median_sim)) +
             geom_ribbon(aes(ymin = lower_50, ymax = upper_50), alpha = 0.1) +
             geom_ribbon(aes(ymin = lower_90, ymax = upper_90), alpha = 0.05) +
             geom_ribbon(aes(ymin = lower_95, ymax = upper_95), alpha = 0.05) +
@@ -190,7 +211,7 @@ sim_glm <- function(obj,
         names(drawn_fitted)[group_position] <- 'group_coef__'
 
         central <- drawn_fitted %>% group_by(xvar__, group_coef__) %>%
-            summarise(mean_sim = mean(qi_),
+            summarise(median_sim = median(qi_),
                       lower_95 = quantile(qi_, probs = 0.025),
                       upper_95 = quantile(qi_, probs = 0.975),
                       lower_90 = quantile(qi_, probs = 0.05),
@@ -214,7 +235,7 @@ sim_glm <- function(obj,
         )
 
         # Plot
-        out_plot <- ggplot(central, aes(xvar__, mean_sim,
+        out_plot <- ggplot(central, aes(xvar__, median_sim,
                             group = group_coef__,
                             fill = group_coef__)) +
             geom_ribbon(aes(ymin = lower_50, ymax = upper_50), alpha = 0.1) +
@@ -226,7 +247,7 @@ sim_glm <- function(obj,
 
     }
     out_plot + xlab(sprintf('\n%s', x_coef)) + ylab(qi_name) +
-                geom_rug(data = rug, aes(x = xvar__, y = mean_sim),
+                geom_rug(data = rug, aes(x = xvar__, y = median_sim),
                          sides = 'b', alpha = 0.2) +
                 theme_bw()
 }

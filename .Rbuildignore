@@ -2,3 +2,4 @@
 ^\.Rproj\.user$
 Rmd$
 ^figure/
+.travis.yml

@@ -3,6 +3,11 @@
 \name{sim_glm}
 \alias{sim_glm}
 \title{Simulate and plot quantities of interest from generalised linear models}
+\source{
+King, Gary, Michael Tomz, and Jason Wittenberg. 2000. "Making the
+Most of Statistical Analyses: Improving Interpretation and Presentation."
+American Journal of Political Science 44(2): 341-55.
+}
 \usage{
 sim_glm(obj, newdata, x_coef, group_coef, n = 1000, model = "lm", col_pal)
 }
@@ -41,8 +46,8 @@ fitted_prestige <- expand.grid(education = 6:16, typewc = 1)
 
 sim_glm(obj = m1, newdata = fitted_prestige, x_coef = 'education')
 
-fitted_prestige <- expand.grid(education = 6:16,
-                               typewc = 0:1)
+fitted_prestige <- expand.grid(education = 6:16, typewc = 0:1)
+
 sim_glm(obj = m1, newdata = fitted_prestige, x_coef = 'education',
         group_coef = 'typewc')
 
@@ -60,12 +65,12 @@ fitted_admit_1 <- with(Admission,
                                    rank2 = 0:1))
 
 sim_glm(obj = m2, newdata = fitted_admit_1, x_coef = 'gre',
-        group_coef = 'rank2', model = 'logit')
+        group_coef = 'rank2', model = 'logit', n = 100)
 
 fitted_admit_2 <- expand.grid(gre = seq(220, 800, by = 10), gpa = c(2, 3.5),
                               rank4 = 1)
 sim_glm(obj = m2, newdata = fitted_admit_2, model = 'logit',
-        x_coef = 'gre', group_coef = 'gpa')
+        x_coef = 'gre', group_coef = 'gpa', n = 100)
 
 }
 
