@@ -26,3 +26,12 @@ HPD <- function(x, probs, side){
     }
     return(out)
 }
+
+#' Internal function to standardise variable names
+
+name_cleaner <- function(x) {
+    x <- gsub('\\(', '.', x)
+    x <- gsub('\\)', '.', x)
+    x <- gsub(' ', '.', x)
+    return(x)
+}

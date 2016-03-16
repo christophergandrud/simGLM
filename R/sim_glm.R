@@ -99,10 +99,8 @@ sim_glm <- function(obj,
     )
 
     # Convert factor parentheses
-    names(newdata) <- gsub('\\(', '.', names(newdata))
-    names(newdata) <- gsub('\\)', '.', names(newdata))
-    x_coef <- gsub('\\(', '.', x_coef)
-    x_coef <- gsub('\\)', '.', x_coef)
+    names(newdata) <- name_cleaner(names(newdata))
+    x_coef <- name_cleaner(x_coef)
 
     if (!missing(group_coef)) {
         if (!(group_coef %in% names(newdata))) stop(
@@ -112,8 +110,7 @@ sim_glm <- function(obj,
             'Your group_coef only has one value, so there is no need to set group_coef.',
             call. = FALSE)
 
-        group_coef <- gsub('\\(', '.', group_coef)
-        group_coef <- gsub('\\)', '.', group_coef)
+        group_coef <- name_cleaner(group_coef)
     }
 
     # Simulate -------------

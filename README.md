@@ -1,7 +1,8 @@
 # simGLM
 
 > Simulate and plot quantities of interest from generalised linear
-    models. Currently only supports normal linear and logistic regression models.
+    models using [King, Tomz, and Wittenburg (2000)](http://www.jstor.org/stable/2669316).
+    Currently only supports normal linear and logistic regression models.
 
 Christopher Gandrud
 
