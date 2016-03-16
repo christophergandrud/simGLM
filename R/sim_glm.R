@@ -15,6 +15,10 @@
 #' Currently must be either \code{lm} or \code{logit}.
 #' @param col_pal character string specifying the plot's colour palette.
 #'
+#' @return A gg ggplot2 object with predicted quantities represented by the
+#' simulation highest 50, 90, and 95 probability intervals. The central line is
+#' the median of the simulation interval.
+#'
 #' @examples
 #' # Normal Linear Model example
 #' library(car) # Contains data
@@ -46,10 +50,6 @@
 #' sim_glm(obj = m2, newdata = fitted_admit_1, x_coef = 'gre',
 #'         group_coef = 'rank2', model = 'logit', n = 100)
 #'
-#' fitted_admit_2 <- expand.grid(gre = seq(220, 800, by = 10), gpa = c(2, 3.5),
-#'                               rank4 = 1)
-#' sim_glm(obj = m2, newdata = fitted_admit_2, model = 'logit',
-#'         x_coef = 'gre', group_coef = 'gpa', n = 100)
 #'
 #' @source King, Gary, Michael Tomz, and Jason Wittenberg. 2000. "Making the
 #' Most of Statistical Analyses: Improving Interpretation and Presentation."
@@ -84,11 +84,11 @@ sim_glm <- function(obj,
         call. = FALSE)
 
     if (missing(x_coef)) {
-        if (missing(x_coef) & ncol(newdata) == 1) {
+        if (ncol(newdata) == 1) {
             x_coef <- names(newdata)
             message(sprintf('%s set for x_coef.', names(newdata)))
         }
-        if (missing(x_coef)) stop(
+        else if (missing(x_coef)) stop(
             "x_coef must be specified to determine the simulation plot's x-axis.",
             call. = FALSE)
     }
@@ -99,6 +99,9 @@ sim_glm <- function(obj,
     )
 
     if (!missing(group_coef)) {
+        if (!(group_coef %in% names(newdata))) stop(
+            'group_coef must be a variable in newdata.'
+        )
         if (length(unique(newdata[, group_coef])) == 1) stop(
             'Your group_coef only has one value, so there is no need to set group_coef.',
             call. = FALSE)
@@ -158,10 +161,10 @@ sim_glm <- function(obj,
         # Find probabilities of y = 1
         drawn_fitted$qi_ <- exp(drawn_fitted$qi_) / (1 - exp(drawn_fitted$qi_))
         # Drop simulations outside of [0, 1]
-        #drawn_fitted <- subset(drawn_fitted, qi_ < 1)
-        #drawn_fitted <- subset(drawn_fitted, qi_ > 0)
-        drawn_fitted$qi_[drawn_fitted$qi_ > 1] <- 1
-        drawn_fitted$qi_[drawn_fitted$qi_ < 1] <- 0
+        drawn_fitted <- subset(drawn_fitted, qi_ < 1)
+        drawn_fitted <- subset(drawn_fitted, qi_ > 0)
+        #drawn_fitted$qi_[drawn_fitted$qi_ > 1] <- 1
+        #drawn_fitted$qi_[drawn_fitted$qi_ < 1] <- 0
         qi_name <- 'Pr(y = 1)\n'
     }
 
@@ -174,27 +177,38 @@ sim_glm <- function(obj,
     }
     else if (!missing(group_coef)) {
         rug <- data.frame(xvar__ = rug, median_sim = 1,
-                          group_coef__ = as.factor(min(newdata[, sprintf('%s_fitted_',
-                                                              group_coef)])))
+                          group_coef__ = as.factor(
+                              min(newdata[, sprintf('%s_fitted_', group_coef)]))
+                          )
         names(rug) <- c('xvar__', 'median_sim', 'group_coef__')
     }
 
-    # Find central intervals
+    # Find highest probability density intervals ---------
     xvar_position <- match(sprintf('%s_fitted_', x_coef), names_fitted)
     names(drawn_fitted)[xvar_position] <- 'xvar__'
 
-    # Plot with no groups ----------
     if (missing(group_coef)) {
-        central <- drawn_fitted %>% group_by(xvar__) %>%
-            summarise(median_sim = median(qi_),
-                      lower_95 = quantile(qi_, probs = 0.025),
-                      upper_95 = quantile(qi_, probs = 0.975),
-                      lower_90 = quantile(qi_, probs = 0.05),
-                      upper_90 = quantile(qi_, probs = 0.95),
-                      lower_50 = quantile(qi_, probs = 0.25),
-                      upper_50 = quantile(qi_, probs = 0.75)
-            )
+        central <- drawn_fitted %>% group_by(xvar__)
+    }
+    else if (!missing(group_coef)) {
+        group_position <- match(sprintf('%s_fitted_', group_coef), names_fitted)
+        if (is.na(group_position)) stop('group_coef must be a variable in newdata.',
+                                        call. = FALSE)
+        names(drawn_fitted)[group_position] <- 'group_coef__'
+        central <- drawn_fitted %>% group_by(xvar__, group_coef__)
+    }
 
+    # Plot with no groups ----------
+    central <- central %>%
+        summarise(median_sim = median(qi_),
+                  lower_95 = HPD(qi_, probs = 0.95, 'lower'),
+                  upper_95 = HPD(qi_, probs = 0.95, 'upper'),
+                  lower_90 = HPD(qi_, probs = 0.9, 'lower'),
+                  upper_90 = HPD(qi_, probs = 0.9, 'upper'),
+                  lower_50 = HPD(qi_, probs = 0.5, 'lower'),
+                  upper_50 = HPD(qi_, probs = 0.5, 'upper')
+            )
+    if (missing(group_coef)) {
         # Plot
         out_plot <- ggplot(central, aes(xvar__, median_sim)) +
             geom_ribbon(aes(ymin = lower_50, ymax = upper_50), alpha = 0.1) +
@@ -205,20 +219,6 @@ sim_glm <- function(obj,
 
     # Plot with groups ----------
     else if (!missing(group_coef)) {
-        group_position <- match(sprintf('%s_fitted_', group_coef), names_fitted)
-        if (is.na(group_position)) stop('group_coef must be a variable in newdata.',
-                                        call. = FALSE)
-        names(drawn_fitted)[group_position] <- 'group_coef__'
-
-        central <- drawn_fitted %>% group_by(xvar__, group_coef__) %>%
-            summarise(median_sim = median(qi_),
-                      lower_95 = quantile(qi_, probs = 0.025),
-                      upper_95 = quantile(qi_, probs = 0.975),
-                      lower_90 = quantile(qi_, probs = 0.05),
-                      upper_90 = quantile(qi_, probs = 0.95),
-                      lower_50 = quantile(qi_, probs = 0.25),
-                      upper_50 = quantile(qi_, probs = 0.75)
-            )
         central$group_coef__ <- as.factor(central$group_coef__)
 
         # Organise colour palette

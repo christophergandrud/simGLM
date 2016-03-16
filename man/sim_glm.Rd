@@ -33,6 +33,11 @@ Currently must be either \code{lm} or \code{logit}.}
 
 \item{col_pal}{character string specifying the plot's colour palette.}
 }
+\value{
+A gg ggplot2 object with predicted quantities represented by the
+simulation highest 50, 90, and 95 probability intervals. The central line is
+the median of the simulation interval.
+}
 \description{
 Simulate and plot quantities of interest from generalised linear models
 }
@@ -67,10 +72,6 @@ fitted_admit_1 <- with(Admission,
 sim_glm(obj = m2, newdata = fitted_admit_1, x_coef = 'gre',
         group_coef = 'rank2', model = 'logit', n = 100)
 
-fitted_admit_2 <- expand.grid(gre = seq(220, 800, by = 10), gpa = c(2, 3.5),
-                              rank4 = 1)
-sim_glm(obj = m2, newdata = fitted_admit_2, model = 'logit',
-        x_coef = 'gre', group_coef = 'gpa', n = 100)
 
 }
 
