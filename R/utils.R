@@ -28,6 +28,8 @@ HPD <- function(x, probs, side){
 }
 
 #' Internal function to standardise variable names
+#' @param x string to clean
+#' @noRd
 
 name_cleaner <- function(x) {
     x <- gsub('\\(', '.', x)

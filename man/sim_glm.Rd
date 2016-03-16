@@ -49,12 +49,12 @@ m1 <- lm(prestige ~ education + type,
 
 fitted_prestige <- expand.grid(education = 6:16, typewc = 1)
 
-sim_glm(obj = m1, newdata = fitted_prestige, x_coef = 'education')
+sim_glm(obj = m1, newdata = fitted_prestige, x_coef = 'education', n = 50)
 
 fitted_prestige <- expand.grid(education = 6:16, typewc = 0:1)
 
 sim_glm(obj = m1, newdata = fitted_prestige, x_coef = 'education',
-        group_coef = 'typewc')
+        group_coef = 'typewc', n = 50)
 
 # Logistic Model example
 URL <- 'http://www.ats.ucla.edu/stat/data/binary.csv'
@@ -70,7 +70,7 @@ fitted_admit_1 <- with(Admission,
                                    rank2 = 0:1))
 
 sim_glm(obj = m2, newdata = fitted_admit_1, x_coef = 'gre',
-        group_coef = 'rank2', model = 'logit', n = 100)
+        group_coef = 'rank2', model = 'logit', n = 50)
 
 
 }

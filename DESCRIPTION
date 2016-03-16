@@ -24,6 +24,5 @@ Suggests:
     knitr
 Enhances:
     arm,
-    glm,
-    lm
+    stats
 RoxygenNote: 5.0.1

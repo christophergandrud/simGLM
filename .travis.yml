@@ -1,6 +1,7 @@
 language: r
 sudo: false
 cache: packages
-r_packages: 
+r_packages:
+  - arm
   - car
   - knitr
