@@ -141,9 +141,8 @@ sim_glm <- function(obj,
     dont_vary <- names(newdata)[!(names(newdata) %in% can_vary)]
     for (i in dont_vary) {
         other_x <- length(unique(newdata[, i]))
-        if (other_x != 1) stop(
-            'To make meaningful plots, only x_var and group_var fitted values should vary.',
-            call. = FALSE
+        if (other_x != 1) message(
+            'Unless you are including interactions, to make meaningful plots only x_var and group_var fitted values should vary.'
         )
     }
 
