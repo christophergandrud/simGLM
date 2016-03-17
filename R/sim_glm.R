@@ -258,9 +258,9 @@ sim_glm <- function(obj,
         out_plot <- ggplot(central, aes(xvar__, median_sim,
                             group = group_coef__,
                             fill = group_coef__)) +
-            geom_ribbon(aes(ymin = lower_50, ymax = upper_50), alpha = 0.1) +
-            geom_ribbon(aes(ymin = lower_90, ymax = upper_90), alpha = 0.05) +
-            geom_ribbon(aes(ymin = lower_95, ymax = upper_95), alpha = 0.05) +
+            geom_ribbon(aes(ymin = lower_50, ymax = upper_50), alpha = 0.2) +
+            geom_ribbon(aes(ymin = lower_90, ymax = upper_90), alpha = 0.1) +
+            geom_ribbon(aes(ymin = lower_95, ymax = upper_95), alpha = 0.1) +
             geom_line(aes(colour = group_coef__)) +
             scale_colour_manual(values = col_pal, name = group_coef) +
             scale_fill_manual(values = col_pal, name = group_coef)
