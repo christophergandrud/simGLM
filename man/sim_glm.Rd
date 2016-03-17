@@ -7,6 +7,11 @@
 King, Gary, Michael Tomz, and Jason Wittenberg. 2000. "Making the
 Most of Statistical Analyses: Improving Interpretation and Presentation."
 American Journal of Political Science 44(2): 341-55.
+
+Christopher Gandrud (2015). simPH: An R Package for Illustrating Estimates
+from Cox Proportional Hazard Models Including for Interactive and Nonlinear
+Effects. Journal of Statistical Software, 65(3), 1-20. URL
+\url{http://www.jstatsoft.org/v65/i03/}.
 }
 \usage{
 sim_glm(obj, newdata, x_coef, group_coef, n = 1000, model = "lm", col_pal)
@@ -37,6 +42,10 @@ Currently must be either \code{lm} or \code{logit}.}
 A gg ggplot2 object with predicted quantities represented by the
 simulation highest 50, 90, and 95 probability intervals. The central line is
 the median of the simulation interval.
+
+Note: for predicted probabilities from logistic regression models,
+predictions outside of [0, 1] are discarded and so not included in the
+median or highest probability density intveral calculations.
 }
 \description{
 Simulate and plot quantities of interest from generalised linear models

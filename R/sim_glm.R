@@ -19,6 +19,10 @@
 #' simulation highest 50, 90, and 95 probability intervals. The central line is
 #' the median of the simulation interval.
 #'
+#' Note: for predicted probabilities from logistic regression models,
+#' predictions outside of [0, 1] are discarded and so not included in the
+#' median or highest probability density intveral calculations.
+#'
 #' @examples
 #' # Normal Linear Model example
 #' library(car) # Contains data
@@ -54,6 +58,11 @@
 #' @source King, Gary, Michael Tomz, and Jason Wittenberg. 2000. "Making the
 #' Most of Statistical Analyses: Improving Interpretation and Presentation."
 #' American Journal of Political Science 44(2): 341-55.
+#'
+#' Christopher Gandrud (2015). simPH: An R Package for Illustrating Estimates
+#' from Cox Proportional Hazard Models Including for Interactive and Nonlinear
+#' Effects. Journal of Statistical Software, 65(3), 1-20. URL
+#' \url{http://www.jstatsoft.org/v65/i03/}.
 #'
 #' @import ggplot2
 #' @importFrom MASS mvrnorm
