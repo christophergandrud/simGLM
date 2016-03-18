@@ -33,6 +33,8 @@ sim_glm(obj = m1, newdata = fitted_prestige, x_coef = 'education') +
 
 ![plot of chunk unnamed-chunk-1](figure/unnamed-chunk-1-1.png)
 
+*Note:* when you create the data frame for the fitted values for your simulations, each column needs to be assigned a name that exactly matches one of the *coefficient names* in the model `summary`.  
+
 ## Example: logistic regression
 
 
@@ -76,11 +78,11 @@ library(arm)
 
 ```r
 # Estimate model
-m2 <- bayesglm(admit ~ gre + gpa + rank, data = Admission, 
+m3 <- bayesglm(admit ~ gre + gpa + rank, data = Admission, 
                family = binomial(link = 'logit'))
 
 # Simulate and plot
-sim_glm(obj = m2, newdata = fitted_admit, model = 'logit', x_coef = 'gre', 
+sim_glm(obj = m3, newdata = fitted_admit, model = 'logit', x_coef = 'gre', 
         group_coef = 'gpa')
 ```
 
@@ -93,6 +95,37 @@ sim_glm(obj = m2, newdata = fitted_admit, model = 'logit', x_coef = 'gre',
 ```
 
 ![plot of chunk unnamed-chunk-4](figure/unnamed-chunk-4-1.png)
+
+## Interactions and polynomials
+
+If you model multi-term effects with interactions and polynomials then you need to specify fitted values for the interaction/polynomial terms, not just the base term. For example:
+
+
+```r
+# Estimate model
+m4 <- glm(admit ~ gre * gpa + rank, data = Admission, family = 'binomial')
+
+fitted_admit$`gre:gpa` <- fitted_admit$gre * fitted_admit$gpa
+
+# Simulate and plot
+sim_glm(obj = m4, newdata = fitted_admit, model = 'logit', x_coef = 'gre', 
+        group_coef = 'gpa')
+```
+
+```
+## Friendly reminder:
+##  Unless you are including interactions, to make meaningful plots only x_var and group_var fitted values should vary.
+```
+
+```
+## rank2 fitted at 0.
+```
+
+```
+## rank3 fitted at 0.
+```
+
+![plot of chunk unnamed-chunk-5](figure/unnamed-chunk-5-1.png)
 
 ## Install
 

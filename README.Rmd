@@ -26,6 +26,8 @@ sim_glm(obj = m1, newdata = fitted_prestige, x_coef = 'education') +
         ylab('Predicted Job Prestige\n') + xlab('\nYears of Education')
 ```
 
+*Note:* when you create the data frame for the fitted values for your simulations, each column needs to be assigned a name that exactly matches one of the *coefficient names* in the model `summary`.  
+
 ## Example: logistic regression
 
 ```{r}
@@ -57,12 +59,28 @@ library(arm)
 ```{r}
 
 # Estimate model
-m2 <- bayesglm(admit ~ gre + gpa + rank, data = Admission, 
+m3 <- bayesglm(admit ~ gre + gpa + rank, data = Admission, 
                family = binomial(link = 'logit'))
 
 # Simulate and plot
-sim_glm(obj = m2, newdata = fitted_admit, model = 'logit', x_coef = 'gre', 
+sim_glm(obj = m3, newdata = fitted_admit, model = 'logit', x_coef = 'gre', 
         group_coef = 'gpa')
+```
+
+## Interactions and polynomials
+
+If you model multi-term effects with interactions and polynomials then you need to specify fitted values for the interaction/polynomial terms, not just the base term. For example:
+
+```{r}
+# Estimate model
+m4 <- glm(admit ~ gre * gpa + rank, data = Admission, family = 'binomial')
+
+fitted_admit$`gre:gpa` <- fitted_admit$gre * fitted_admit$gpa
+
+# Simulate and plot
+sim_glm(obj = m4, newdata = fitted_admit, model = 'logit', x_coef = 'gre', 
+        group_coef = 'gpa')
+
 ```
 
 ## Install
