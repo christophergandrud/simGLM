@@ -88,6 +88,11 @@ sim_glm <- function(obj,
     if (!(model %in% c('lm', 'logit'))) stop('model must be either lm or logit.',
                                              call. = FALSE)
 
+    if (is.integer(newdata) & !missing(x_coef)) {
+        newdata <- data.frame(newdata)
+        names(newdata) <- x_coef
+    }
+
     if (!is.data.frame(newdata)) stop(
         'newdata must be a data frame of fitted values',
         call. = FALSE)

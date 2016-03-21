@@ -133,5 +133,5 @@ To install the development version of **simGLM** use:
 
 
 ```r
-ghit::install_github('christophergandrud/simGLM')
+devtools::install_github('christophergandrud/simGLM')
 ```

@@ -88,5 +88,5 @@ sim_glm(obj = m4, newdata = fitted_admit, model = 'logit', x_coef = 'gre',
 To install the development version of **simGLM** use:
 
 ```{r, eval=FALSE}
-ghit::install_github('christophergandrud/simGLM')
+devtools::install_github('christophergandrud/simGLM')
 ```
