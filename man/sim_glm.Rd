@@ -33,8 +33,14 @@ grouped in the plot.}
 
 \item{n}{numeric specifying the number of simulations to run.}
 
-\item{model}{character string specifying the type of estimation model.
-Currently must be either \code{lm} or \code{logit}.}
+\item{model}{character string or function specifying the type of estimation
+model for the quantity of interest. Currently must be the string
+\code{'lm'} (for predicted values of a continuous response variable) or the
+string \code{'logit'} (for predicted probabilities of a binary dependent
+response varible being 1). Experimental: you could also include a specify
+a function that takes a vector of values from your simulated point estimates
+and fitted values (e.g. \emph{alpha + beta1 * x1 + beta2 * x2}) return a
+numeric vector with your custom quantity of interest.}
 
 \item{col_pal}{character string specifying the plot's colour palette.}
 }

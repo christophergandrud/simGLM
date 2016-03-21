@@ -1,5 +1,5 @@
 ^.*\.Rproj$
 ^\.Rproj\.user$
-Rmd$
+.Rmd$
 ^figure/
 .travis.yml

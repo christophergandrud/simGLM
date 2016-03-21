@@ -11,8 +11,14 @@
 #' coefficient in \code{obj} along which the values of \code{x_coef} will be
 #' grouped in the plot.
 #' @param n numeric specifying the number of simulations to run.
-#' @param model character string specifying the type of estimation model.
-#' Currently must be either \code{lm} or \code{logit}.
+#' @param model character string or function specifying the type of estimation
+#' model for the quantity of interest. Currently must be the string
+#' \code{'lm'} (for predicted values of a continuous response variable) or the
+#' string \code{'logit'} (for predicted probabilities of a binary dependent
+#' response varible being 1). Experimental: you could also include a specify
+#' a function that takes a vector of values from your simulated point estimates
+#' and fitted values (e.g. \emph{alpha + beta1 * x1 + beta2 * x2}) return a
+#' numeric vector with your custom quantity of interest.
 #' @param col_pal character string specifying the plot's colour palette.
 #'
 #' @return A gg ggplot2 object with predicted quantities represented by the
@@ -85,8 +91,9 @@ sim_glm <- function(obj,
 
     # Argument sanity check --------
     model <- tolower(model)
-    if (!(model %in% c('lm', 'logit'))) stop('model must be either lm or logit.',
-                                             call. = FALSE)
+    if (!(model %in% c('lm', 'logit')) | is.function(model)) stop(
+        "model must be 'lm', 'logit', or a function to find a custom quantity of intest.",
+        call. = FALSE)
 
     if (is.integer(newdata) & !missing(x_coef)) {
         newdata <- data.frame(newdata)
@@ -191,15 +198,19 @@ sim_glm <- function(obj,
     if (model == 'lm') {
         qi_name <- 'Predicted Value of y\n'
     }
-    if (model == 'logit') {
+    else if (model == 'logit') {
         # Find probabilities of y = 1
         drawn_fitted$qi_ <- exp(drawn_fitted$qi_) / (1 - exp(drawn_fitted$qi_))
         # Drop simulated quantities of interest outside of [0, 1]
         drawn_fitted <- subset(drawn_fitted, qi_ < 1)
         drawn_fitted <- subset(drawn_fitted, qi_ > 0)
-        #drawn_fitted$qi_[drawn_fitted$qi_ > 1] <- 1
-        #drawn_fitted$qi_[drawn_fitted$qi_ < 1] <- 0
         qi_name <- 'Pr(y = 1)\n'
+    }
+    # Allow user to specify custom QI function
+    else if (is.function(model)) {
+        message('Using custom user created quantity of interest function.')
+        drawn_fitted$qi_ <- model(drawn_fitted$qi_)
+        qi_name <- 'Quantity of Interest\n'
     }
 
     # Find original distribution of x_coef for rug plot --------

@@ -67,7 +67,7 @@ sim_glm(obj = m3, newdata = fitted_admit, model = 'logit', x_coef = 'gre',
         group_coef = 'gpa')
 ```
 
-## Interactions and polynomials
+## Example: Interactions and polynomials
 
 If you model multi-term effects with interactions and polynomials then you need to specify fitted values for the interaction/polynomial terms, not just the base term. For example:
 
@@ -82,6 +82,10 @@ sim_glm(obj = m4, newdata = fitted_admit, model = 'logit', x_coef = 'gre',
         group_coef = 'gpa')
 
 ```
+
+## Custom Quantities of Interest
+
+**Experimental:** in order to allow the user to specify other quantites of interest for other GLM type models, the `model` argument of `sim_glm` allows you to specify a function with which to calculate a custom quantity of interest. The function must take as its input a vector of values from your simulated point estimates and fitted values (e.g. *alpha + beta1 * x1 + beta2 * x2*) and return a numeric vector with your custom quantity of interest.
 
 ## Install
 
