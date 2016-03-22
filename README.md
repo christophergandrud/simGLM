@@ -15,14 +15,7 @@ Christopher Gandrud
 library(car) # contains data
 library(simGLM)
 library(ggplot2) # only needed for adding additional arguments outside of sim_glm
-```
 
-```
-## Use suppressPackageStartupMessages() to eliminate package startup
-## messages.
-```
-
-```r
 # Estimate model
 m1 <- lm(prestige ~ education + type, data = Prestige)
 
@@ -71,11 +64,16 @@ sim_glm(obj = m2, newdata = fitted_admit, model = 'logit', x_coef = 'gre',
 ## rank3 fitted at 0.
 ```
 
+```
+## Predicted probabilities calculated outside of the [0, 1] interval. 
+##  These are being removed from the simulated distribution. . .
+```
+
 ![plot of chunk unnamed-chunk-2](figure/unnamed-chunk-2-1.png)
 
 ## Examples: `bayesglm`
 
-`sim_glm` also works with estimates made using the `bayesglm` funciton in the [arm](https://cran.r-project.org/web/packages/arm/index.html) package.
+`sim_glm` also works with estimates made using the `bayesglm` funciton in the [arm](https://cran.r-project.org/web/packages/arm/index.html) package. This function uses minimal prior information suggested by [Gelman et al. (2008)](http://www.stat.columbia.edu/~gelman/research/published/priors11.pdf) to avoid well known problems of unrealistic logistic regression coefficient sizes and, in the extreme case, complete separation
 
 
 ```r
@@ -99,6 +97,11 @@ sim_glm(obj = m3, newdata = fitted_admit, model = 'logit', x_coef = 'gre',
 
 ```
 ## rank3 fitted at 0.
+```
+
+```
+## Predicted probabilities calculated outside of the [0, 1] interval. 
+##  These are being removed from the simulated distribution. . .
 ```
 
 ![plot of chunk unnamed-chunk-4](figure/unnamed-chunk-4-1.png)
@@ -130,6 +133,11 @@ sim_glm(obj = m4, newdata = fitted_admit, model = 'logit', x_coef = 'gre',
 
 ```
 ## rank3 fitted at 0.
+```
+
+```
+## Predicted probabilities calculated outside of the [0, 1] interval. 
+##  These are being removed from the simulated distribution. . .
 ```
 
 ![plot of chunk unnamed-chunk-5](figure/unnamed-chunk-5-1.png)

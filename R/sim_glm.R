@@ -201,9 +201,12 @@ sim_glm <- function(obj,
     else if (model == 'logit') {
         # Find probabilities of y = 1
         drawn_fitted$qi_ <- exp(drawn_fitted$qi_) / (1 - exp(drawn_fitted$qi_))
-        # Drop simulated quantities of interest outside of [0, 1]
-        drawn_fitted <- subset(drawn_fitted, qi_ < 1)
-        drawn_fitted <- subset(drawn_fitted, qi_ > 0)
+        # Drop simulated quantities of interest outside of
+        if (any(drawn_fitted$qi_ > 1 | drawn_fitted$qi_ < 0)) {
+            message('Predicted probabilities calculated outside of the [0, 1] interval. \n These are being removed from the simulated distribution. . .')
+            drawn_fitted <- subset(drawn_fitted, qi_ < 1)
+            drawn_fitted <- subset(drawn_fitted, qi_ > 0)
+        }
         qi_name <- 'Pr(y = 1)\n'
     }
     # Allow user to specify custom QI function

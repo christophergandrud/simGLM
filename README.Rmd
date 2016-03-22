@@ -50,7 +50,7 @@ sim_glm(obj = m2, newdata = fitted_admit, model = 'logit', x_coef = 'gre',
 
 ## Examples: `bayesglm`
 
-`sim_glm` also works with estimates made using the `bayesglm` funciton in the [arm](https://cran.r-project.org/web/packages/arm/index.html) package.
+`sim_glm` also works with estimates made using the `bayesglm` funciton in the [arm](https://cran.r-project.org/web/packages/arm/index.html) package. This function uses minimal prior information suggested by [Gelman et al. (2008)](http://www.stat.columbia.edu/~gelman/research/published/priors11.pdf) to avoid well known problems of unrealistic logistic regression coefficient sizes and, in the extreme case, complete separation
 
 ```{r, message=FALSE}
 library(arm)
